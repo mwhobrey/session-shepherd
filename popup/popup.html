@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Shepherd</title>
+    <link rel="stylesheet" href="popup.css">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <style>
+        html, body {
+            width: 400px !important;
+            min-width: 400px !important;
+            max-width: 400px !important;
+        }
+    </style>
+</head>
+<body>
+    <div class="popup-container">
+        <!-- Header with tabs -->
+        <div class="header">
+            <div class="tab-buttons">
+                <button id="create-tab" class="tab-button active" data-tab="create">
+                    <span class="material-icons">add</span>
+                    Create
+                </button>
+                <button id="sessions-tab" class="tab-button" data-tab="sessions">
+                    <span class="material-icons">folder</span>
+                    Sessions
+                </button>
+            </div>
+            <div class="theme-toggle">
+                <button id="theme-toggle" class="theme-button" title="Toggle theme">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Create Tab Content -->
+        <div id="create-content" class="tab-content active">
+            <div class="content-header">
+                <h2>Create New Session</h2>
+                <p class="subtitle">Select tabs to save and give your session a name</p>
+            </div>
+
+            <!-- Session Name Input -->
+            <div class="input-group">
+                <label for="session-name">Session Name</label>
+                <input type="text" id="session-name" placeholder="Enter session name..." maxlength="50">
+            </div>
+
+            <!-- Session Metadata -->
+            <div class="session-metadata">
+                <div class="input-group">
+                    <label for="session-category">Category</label>
+                    <select id="session-category">
+                        <option value="work">Work</option>
+                        <option value="personal">Personal</option>
+                        <option value="research">Research</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="development">Development</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <label for="session-tags">Tags</label>
+                    <input type="text" id="session-tags" placeholder="Enter tags (comma-separated)" maxlength="100">
+                    <div class="input-hint">e.g., project, urgent, meeting</div>
+                </div>
+            </div>
+
+            <!-- Tab Management Section -->
+            <div class="tab-management-section">
+                <div class="section-header">
+                    <h3>Select Tabs</h3>
+                    <div class="selection-controls">
+                        <button id="select-all" class="text-button">Select All</button>
+                        <button id="select-none" class="text-button">Select None</button>
+                    </div>
+                </div>
+                
+                <!-- Tab Search -->
+                <div class="tab-search">
+                    <div class="search-input-group">
+                        <span class="material-icons search-icon">search</span>
+                        <input type="text" id="tab-search" placeholder="Search tabs..." autocomplete="off">
+                        <button id="clear-search" class="clear-search-button" title="Clear search">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                    <div class="search-results-info">
+                        <span id="search-results-count">Showing all tabs</span>
+                    </div>
+                </div>
+
+
+                <!-- Tabs List -->
+                <div id="tabs-list" class="tabs-list">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="action-buttons">
+                <button id="save-only" class="button outlined">
+                    <span class="material-icons">save</span>
+                    Save Only
+                </button>
+                <button id="save-close" class="button filled primary">
+                    <span class="material-icons">save_alt</span>
+                    Save & Close
+                </button>
+            </div>
+        </div>
+
+        <!-- Sessions Tab Content -->
+        <div id="sessions-content" class="tab-content">
+            <div class="content-header">
+                <h2>Saved Sessions</h2>
+                <p class="subtitle">Quick access to your saved sessions</p>
+            </div>
+
+            <!-- Sessions List -->
+            <div id="sessions-list" class="sessions-list">
+                <!-- Sessions will be populated by JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">
+                    <span class="material-icons">folder_open</span>
+                </div>
+                <h3>No sessions saved yet</h3>
+                <p>Your saved sessions will appear here</p>
+                <button id="go-to-create" class="button filled">
+                    <span class="material-icons">add</span>
+                    Create Your First Session
+                </button>
+            </div>
+
+            <!-- Manage All Sessions CTA -->
+            <div class="manage-all-cta">
+                <button id="manage-all-sessions" class="button outlined">
+                    <span class="material-icons">dashboard</span>
+                    Open Dashboard
+                    <span class="material-icons">open_in_new</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Confirmation Dialog -->
+        <div id="confirmation-dialog" class="dialog-overlay">
+            <div class="dialog">
+                <div class="dialog-header">
+                    <h3>Confirm Deletion</h3>
+                </div>
+                <div class="dialog-content">
+                    <p>Are you sure you want to permanently delete this session?</p>
+                    <p class="dialog-warning">This action cannot be undone.</p>
+                </div>
+                <div class="dialog-actions">
+                    <button id="cancel-delete" class="button outlined">Cancel</button>
+                    <button id="confirm-delete" class="button filled danger">Delete</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Keyboard Shortcuts Help Dialog -->
+        <div id="keyboard-help-dialog" class="dialog-overlay">
+            <div class="dialog keyboard-help-dialog">
+                <div class="dialog-header">
+                    <h3>Keyboard Shortcuts</h3>
+                    <button id="close-keyboard-help" class="close-button">
+                        <span class="material-icons">close</span>
+                    </button>
+                </div>
+                <div class="dialog-content">
+                    <div class="keyboard-shortcuts-list">
+                        <div class="shortcut-section">
+                            <h4>General</h4>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + 1</span>
+                                <span class="shortcut-description">Switch to Create tab</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + 2</span>
+                                <span class="shortcut-description">Switch to Sessions tab</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + T</span>
+                                <span class="shortcut-description">Toggle theme</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Escape</span>
+                                <span class="shortcut-description">Clear search / Close dialogs</span>
+                            </div>
+                        </div>
+                        
+                        <div class="shortcut-section">
+                            <h4>Create Tab</h4>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + S</span>
+                                <span class="shortcut-description">Save session</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + Shift + S</span>
+                                <span class="shortcut-description">Save and close tabs</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + A</span>
+                                <span class="shortcut-description">Select all tabs</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + D</span>
+                                <span class="shortcut-description">Deselect all tabs</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + F</span>
+                                <span class="shortcut-description">Focus search</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Enter</span>
+                                <span class="shortcut-description">Save session (when name focused)</span>
+                            </div>
+                        </div>
+                        
+                        <div class="shortcut-section">
+                            <h4>Sessions Tab</h4>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + E</span>
+                                <span class="shortcut-description">Export sessions</span>
+                            </div>
+                            <div class="shortcut-item">
+                                <span class="shortcut-key">Ctrl + I</span>
+                                <span class="shortcut-description">Import sessions</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="popup.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Shepherd - Manage All Sessions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="dashboard.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="../assets/icons/shep-icon.svg" alt="Session Shepherd" class="logo-icon">
+                    <h1>Session Shepherd</h1>
+                </div>
+                <p class="header-subtitle">Manage All Sessions</p>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-main">
+        <!-- Filters Section -->
+        <section class="filters-section">
+            <div class="filters-container">
+                <h2>Filter Sessions</h2>
+                <div class="filters-grid">
+                    <!-- Category Filter -->
+                    <div class="filter-group">
+                        <label for="category-filter">Category</label>
+                        <select id="category-filter">
+                            <option value="">All Categories</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="research">Research</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="development">Development</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <!-- Tag Filter -->
+                    <div class="filter-group">
+                        <label for="tag-filter">Tags</label>
+                        <input type="text" id="tag-filter" placeholder="Enter tags (comma-separated)...">
+                    </div>
+
+                    <!-- Domain Filter -->
+                    <div class="filter-group">
+                        <label for="domain-filter">Domain</label>
+                        <input type="text" id="domain-filter" placeholder="e.g., *.github.com, stackoverflow.com">
+                    </div>
+
+                    <!-- Filter Actions -->
+                    <div class="filter-actions">
+                        <div class="filter-buttons">
+                            <button id="apply-filters" class="button filled">Apply Filters</button>
+                            <button id="clear-filters" class="button outlined">Clear All</button>
+                        </div>
+                        <div class="filter-results">
+                            <span id="filter-results-count" class="filter-count">Showing all sessions</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sessions Section -->
+        <section class="sessions-section">
+            <div class="sessions-header">
+                <h2>Your Sessions</h2>
+                <div class="sessions-actions">
+                    <button id="create-new-session" class="button filled primary">
+                        <span class="material-icons">add</span>
+                        Create New Session
+                    </button>
+                </div>
+            </div>
+
+            <!-- Sessions Grid -->
+            <div id="sessions-grid" class="sessions-grid">
+                <!-- Sessions will be populated by JavaScript -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="empty-state" class="empty-state">
+                <div class="empty-icon">
+                    <span class="material-icons">folder_open</span>
+                </div>
+                <h3>No sessions found</h3>
+                <p id="empty-state-message">Your saved sessions will appear here</p>
+                <button id="create-first-session" class="button filled">
+                    <span class="material-icons">add</span>
+                    Create Your First Session
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog" class="dialog-overlay">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3 id="dialog-title">Confirm Action</h3>
+                <button id="close-dialog" class="close-button">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <p id="dialog-message">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="dialog-actions">
+                <button id="cancel-action" class="button outlined">Cancel</button>
+                <button id="confirm-action" class="button filled danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <span class="material-icons">refresh</span>
+        </div>
+        <p>Loading sessions...</p>
+    </div>
+
+    <script src="dashboard.js"></script>
+</body>
+</html>

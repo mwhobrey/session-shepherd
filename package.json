@@ -1,0 +1,52 @@
+{
+  "name": "session-shepherd",
+  "version": "1.0.0",
+  "description": "Beautiful, intuitive session management for your browser tabs",
+  "main": "popup/popup.js",
+  "scripts": {
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "echo 'E2E tests require manual testing. See tests/e2e/manual-testing-guide.md'",
+    "test:all": "npm run test && npm run test:coverage",
+    "test:manual": "echo 'See tests/e2e/manual-testing-guide.md for manual testing instructions'",
+    "lint": "eslint popup/ background/ tests/",
+    "lint:fix": "eslint popup/ background/ tests/ --fix",
+    "build": "echo 'No build step required for vanilla JS extension'",
+    "package": "zip -r session-shepherd.zip . -x '*.git*' 'node_modules/*' 'tests/*' '*.md' 'package*.json'"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.254",
+    "@types/jest": "^29.5.8",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "puppeteer": "^23.0.0",
+    "puppeteer-core": "^23.0.0"
+  },
+  "jest": {
+    "testEnvironment": "jsdom",
+    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "testMatch": [
+      "<rootDir>/tests/unit/**/*.test.js",
+      "<rootDir>/tests/unit/**/*.spec.js"
+    ],
+    "collectCoverageFrom": [
+      "popup/**/*.js",
+      "background/**/*.js",
+      "!**/node_modules/**",
+      "!**/tests/**"
+    ],
+    "coverageDirectory": "coverage",
+    "coverageReporters": ["text", "lcov", "html"]
+  },
+  "keywords": [
+    "chrome-extension",
+    "tab-management",
+    "session-management",
+    "browser-extension",
+    "material-design"
+  ],
+  "author": "Session Shepherd Team",
+  "license": "MIT"
+}
