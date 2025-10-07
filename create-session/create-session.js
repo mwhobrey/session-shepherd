@@ -399,11 +399,21 @@ class CreateSessionPage {
   }
 
   showError(message) {
-    alert(message); // TODO: Replace with toast notification
+    if (window.toastManager) {
+      window.toastManager.error(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   showSuccess(message) {
-    alert(message); // TODO: Replace with toast notification
+    if (window.toastManager) {
+      window.toastManager.success(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   updateUI() {

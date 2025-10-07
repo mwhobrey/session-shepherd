@@ -722,15 +722,23 @@ class SessionShepherd {
   }
 
   showError(message) {
-    // Simple error display - could be enhanced with toast notifications
     console.error(message);
-    alert(message);
+    if (window.toastManager) {
+      window.toastManager.error(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   showSuccess(message) {
-    // Simple success display - could be enhanced with toast notifications
     console.log(message);
-    // Could add a toast notification here
+    if (window.toastManager) {
+      window.toastManager.success(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   openComingSoon() {

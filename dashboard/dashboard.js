@@ -592,14 +592,22 @@ class SessionDashboard {
 
   showError(message) {
     console.error(message);
-    // Simple error display - could be enhanced with toast notifications
-    alert(message);
+    if (window.toastManager) {
+      window.toastManager.error(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   showSuccess(message) {
     console.log(message);
-    // Simple success display - could be enhanced with toast notifications
-    // Could add a toast notification here
+    if (window.toastManager) {
+      window.toastManager.success(message);
+    } else {
+      // Fallback to alert if toast manager not available
+      alert(message);
+    }
   }
 
   escapeHtml(text) {

@@ -41,7 +41,7 @@
   
   "web_accessible_resources": [
     {
-      "resources": ["coming-soon.html", "dashboard/dashboard.html", "dashboard/dashboard.css", "dashboard/dashboard.js", "create-session/create-session.html", "create-session/create-session.css", "create-session/create-session.js"],
+      "resources": ["coming-soon.html", "dashboard/dashboard.html", "dashboard/dashboard.css", "dashboard/dashboard.js", "create-session/create-session.html", "create-session/create-session.css", "create-session/create-session.js", "assets/css/toast.css", "assets/js/toast.js"],
       "matches": ["<all_urls>"]
     }
   ]
