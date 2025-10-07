@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create New Session - Session Shepherd</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="create-session.css">
+</head>
+<body>
+    <!-- Header -->
+    <header class="create-header">
+        <div class="header-content">
+            <div class="header-left">
+                <button id="back-to-dashboard" class="back-button" title="Back to Dashboard">
+                    <span class="material-icons">arrow_back</span>
+                    Back to Dashboard
+                </button>
+                <h1>Create New Session</h1>
+            </div>
+            <div class="header-right">
+                <button id="theme-toggle" class="theme-toggle" title="Toggle dark mode">
+                    <span class="material-icons">dark_mode</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="create-main">
+        <div class="create-container">
+            <!-- Session Details -->
+            <section class="session-details">
+                <div class="form-group">
+                    <label for="session-name">SESSION NAME</label>
+                    <input type="text" id="session-name" placeholder="Enter session name..." maxlength="50">
+                    <div class="validation-message" id="session-name-error"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="session-category">CATEGORY</label>
+                        <select id="session-category">
+                            <option value="">Select category</option>
+                            <option value="work">Work</option>
+                            <option value="personal">Personal</option>
+                            <option value="research">Research</option>
+                            <option value="shopping">Shopping</option>
+                            <option value="entertainment">Entertainment</option>
+                            <option value="development">Development</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="session-tags">TAGS</label>
+                        <input type="text" id="session-tags" placeholder="Enter tags (comma-separated)">
+                    </div>
+                </div>
+            </section>
+
+            <!-- Tab Selection -->
+            <section class="tab-selection">
+                <div class="tab-header">
+                    <h2>Select Tabs</h2>
+                    <div class="tab-actions">
+                        <button id="select-all-tabs" class="action-link">Select All</button>
+                        <button id="select-no-tabs" class="action-link">Select None</button>
+                    </div>
+                </div>
+
+                <div class="tab-search">
+                    <div class="search-input-container">
+                        <span class="material-icons search-icon">search</span>
+                        <input type="text" id="tab-search" placeholder="Search tabs...">
+                        <button id="clear-search" class="clear-search" title="Clear search">
+                            <span class="material-icons">close</span>
+                        </button>
+                    </div>
+                    <div class="search-results" id="search-results-count">Showing all tabs</div>
+                </div>
+
+                <div class="tabs-list" id="tabs-list">
+                    <!-- Tabs will be populated by JavaScript -->
+                </div>
+            </section>
+
+            <!-- Action Buttons -->
+            <section class="action-buttons">
+                <button id="save-only" class="button outlined" disabled>
+                    <span class="material-icons">save</span>
+                    Save Only
+                </button>
+                <button id="save-and-close" class="button filled" disabled>
+                    <span class="material-icons">save</span>
+                    Save & Close
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmation-dialog" class="dialog-overlay">
+        <div class="dialog">
+            <div class="dialog-header">
+                <h3 id="dialog-title">Confirm Action</h3>
+                <button id="close-dialog" class="close-button">
+                    <span class="material-icons">close</span>
+                </button>
+            </div>
+            <div class="dialog-content">
+                <p id="dialog-message">Are you sure you want to perform this action?</p>
+            </div>
+            <div class="dialog-actions">
+                <button id="cancel-action" class="button outlined">Cancel</button>
+                <button id="confirm-action" class="button filled danger">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <span class="material-icons">refresh</span>
+        </div>
+        <p>Loading...</p>
+    </div>
+
+    <script src="create-session.js"></script>
+</body>
+</html>

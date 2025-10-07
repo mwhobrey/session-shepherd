@@ -19,9 +19,9 @@
     "default_popup": "popup/popup.html",
     "default_title": "Session Shepherd",
     "default_icon": {
-      "16": "assets/icons/shep-icon16.png",
-      "48": "assets/icons/shep-icon48.png",
-      "128": "assets/icons/shep-icon128.png"
+      "16": "assets/icons/icon16.png",
+      "48": "assets/icons/icon48.png",
+      "128": "assets/icons/icon128.png"
     }
   },
   
@@ -30,9 +30,9 @@
   },
   
   "icons": {
-    "16": "assets/icons/shep-icon16.png",
-    "48": "assets/icons/shep-icon48.png",
-    "128": "assets/icons/shep-icon128.png"
+    "16": "assets/icons/icon16.png",
+    "48": "assets/icons/icon48.png",
+    "128": "assets/icons/icon128.png"
   },
   
   "content_security_policy": {
@@ -41,7 +41,7 @@
   
   "web_accessible_resources": [
     {
-      "resources": ["coming-soon.html", "dashboard/dashboard.html", "dashboard/dashboard.css", "dashboard/dashboard.js"],
+      "resources": ["coming-soon.html", "dashboard/dashboard.html", "dashboard/dashboard.css", "dashboard/dashboard.js", "create-session/create-session.html", "create-session/create-session.css", "create-session/create-session.js"],
       "matches": ["<all_urls>"]
     }
   ]

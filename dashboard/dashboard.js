@@ -24,6 +24,7 @@ class SessionDashboard {
       await this.loadSessions();
       await this.loadTheme();
       this.setupEventListeners();
+      this.initStorageSync();
       this.renderSessions();
       this.showLoading(false);
     } catch (error) {
@@ -91,6 +92,25 @@ class SessionDashboard {
     } catch (error) {
       console.error('Failed to save theme:', error);
     }
+  }
+
+  // Storage synchronization
+  initStorageSync() {
+    // Listen for storage changes to sync with popup
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+      if (namespace === 'local' && changes.sessions) {
+        console.log('Storage change detected in dashboard, syncing sessions...');
+        // Debounce to prevent excessive re-renders
+        clearTimeout(this.storageChangeTimeout);
+        this.storageChangeTimeout = setTimeout(() => {
+          this.loadSessions().then(() => {
+            this.renderSessions();
+            this.updateFilterResultsCount();
+            console.log('Dashboard sessions synced from storage change');
+          });
+        }, 100);
+      }
+    });
   }
 
   setupEventListeners() {
@@ -213,8 +233,8 @@ class SessionDashboard {
 
 
   createNewSession() {
-    // Open the extension popup in a new tab to create a new session
-    chrome.tabs.create({ url: chrome.runtime.getURL('popup/popup.html') });
+    // Open the full-page create session interface
+    chrome.tabs.create({ url: chrome.runtime.getURL('create-session/create-session.html') });
   }
 
   applyFilters() {

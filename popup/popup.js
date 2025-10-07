@@ -41,6 +41,9 @@ class SessionShepherd {
       // Initialize auto-save
       this.initAutoSave();
         
+      // Initialize storage synchronization
+      this.initStorageSync();
+        
       // Restore last used tab
       this.restoreLastTab();
             
@@ -1274,6 +1277,24 @@ class SessionShepherd {
       console.error('Import save failed:', error);
       this.showError('Failed to save imported sessions');
     }
+  }
+
+  // Storage synchronization
+  initStorageSync() {
+    // Listen for storage changes to sync with dashboard
+    chrome.storage.onChanged.addListener((changes, namespace) => {
+      if (namespace === 'local' && changes.sessions) {
+        console.log('Storage change detected, syncing sessions...');
+        // Debounce to prevent excessive re-renders
+        clearTimeout(this.storageChangeTimeout);
+        this.storageChangeTimeout = setTimeout(() => {
+          this.loadSessions().then(() => {
+            this.renderSessions();
+            console.log('Sessions synced from storage change');
+          });
+        }, 100);
+      }
+    });
   }
 
   // Auto-save functionality
