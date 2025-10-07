@@ -11,9 +11,7 @@ class SessionShepherd {
     this.selectedTabIds = new Set();
     this.pendingDeleteId = null;
     this.isOpeningDashboard = false;
-    
-    // Debug: Check if function exists
-    console.log('Constructor: renderSessions function exists:', typeof this.renderSessions);
+    this.currentTheme = 'system'; // Track current theme in class property
         
     this.init();
   }
@@ -29,11 +27,11 @@ class SessionShepherd {
       // Set up event listeners
       this.setupEventListeners();
             
+      // Initialize theme first
+      this.initTheme();
+            
       // Set up validation
       this.setupValidation();
-            
-      // Initialize theme
-      this.initTheme();
         
       // Initialize keyboard shortcuts
       this.initKeyboardShortcuts();
@@ -592,21 +590,25 @@ class SessionShepherd {
 
   // Validation methods
   setupValidation() {
-    const sessionNameInput = document.getElementById('session-name');
-    if (sessionNameInput) {
-      sessionNameInput.addEventListener('input', () => {
-        this.validateSessionName();
-        this.updateSaveButtonStates();
-      });
-      sessionNameInput.addEventListener('blur', () => {
-        this.validateSessionName();
-        this.updateSaveButtonStates();
-      });
-    }
+    try {
+      const sessionNameInput = document.getElementById('session-name');
+      if (sessionNameInput) {
+        sessionNameInput.addEventListener('input', () => {
+          this.validateSessionName();
+          this.updateSaveButtonStates();
+        });
+        sessionNameInput.addEventListener('blur', () => {
+          this.validateSessionName();
+          this.updateSaveButtonStates();
+        });
+      }
         
-    // Validate tab selection when tabs change
-    this.validateTabSelection();
-    this.updateSaveButtonStates();
+      // Validate tab selection when tabs change
+      this.validateTabSelection();
+      this.updateSaveButtonStates();
+    } catch (error) {
+      console.error('Error setting up validation:', error);
+    }
   }
 
   validateSessionName() {
@@ -846,18 +848,19 @@ class SessionShepherd {
     try {
       const result = await chrome.storage.local.get(['theme']);
       const theme = result.theme || 'system';
+      this.currentTheme = theme; // Update class property
       this.applyTheme(theme);
     } catch (error) {
       console.error('Failed to load theme:', error);
+      this.currentTheme = 'system'; // Update class property
       this.applyTheme('system');
     }
   }
 
   async toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme');
     let newTheme;
         
-    switch (currentTheme) {
+    switch (this.currentTheme) {
     case 'light':
       newTheme = 'dark';
       break;
@@ -867,7 +870,8 @@ class SessionShepherd {
     default:
       newTheme = 'light';
     }
-        
+    
+    this.currentTheme = newTheme; // Update class property
     this.applyTheme(newTheme);
         
     try {
@@ -1491,7 +1495,8 @@ class SessionShepherd {
 
 // Initialize the extension when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
-  new SessionShepherd();
+  console.log('DOM loaded, initializing SessionShepherd');
+  window.sessionShepherd = new SessionShepherd();
 });
 
 // Debug: Verify function exists
@@ -1517,9 +1522,4 @@ if (typeof module !== 'undefined' && module.exports) {
   module.exports = SessionShepherd;
 }
 
-// Initialize the extension when the popup loads
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM loaded, initializing SessionShepherd'); // Debug log
-  window.sessionShepherd = new SessionShepherd();
-});
 

@@ -92,6 +92,7 @@ body {
 .theme-toggle {
     display: flex;
     align-items: center;
+    flex-shrink: 0;
 }
 
 .theme-button {
@@ -120,10 +121,13 @@ body {
 .tab-buttons {
     display: flex;
     gap: 8px;
+    flex: 1;
+    min-width: 0;
 }
 
 .tab-button {
     flex: 1;
+    min-width: 0;
     display: flex;
     align-items: center;
     justify-content: center;
