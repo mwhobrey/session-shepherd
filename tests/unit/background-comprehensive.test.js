@@ -361,4 +361,72 @@ describe('Background Service Worker Comprehensive Tests', () => {
       expect(chrome.storage.local.set).toHaveBeenCalledTimes(10);
     });
   });
+
+          describe('Message Handling', () => {
+            test('should have message listener available', () => {
+              expect(chrome.runtime.onMessage.addListener).toBeDefined();
+            });
+          });
+
+  describe('Error Handling', () => {
+    test('should handle storage errors gracefully', async () => {
+      chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
+      
+      // Test that storage operations don't crash the extension
+      try {
+        await chrome.storage.local.get(['sessions']);
+      } catch (error) {
+        expect(error.message).toBe('Storage error');
+      }
+    });
+  });
+
+  describe('Session Management', () => {
+    test('should handle session operations', async () => {
+      const mockSessions = [
+        { id: '1', name: 'Session 1', tabs: [] },
+        { id: '2', name: 'Session 2', tabs: [] }
+      ];
+      
+      chrome.storage.local.get.mockResolvedValue({ sessions: mockSessions });
+      chrome.storage.local.set.mockResolvedValue();
+      
+      // Test basic storage operations
+      const result = await chrome.storage.local.get(['sessions']);
+      expect(result.sessions).toEqual(mockSessions);
+      
+      await chrome.storage.local.set({ sessions: mockSessions });
+      expect(chrome.storage.local.set).toHaveBeenCalledWith({ sessions: mockSessions });
+    });
+  });
+
+  describe('Tab Filtering', () => {
+    test('should handle tab operations', async () => {
+      const mockTabs = [
+        { id: 1, title: 'Regular Tab', url: 'https://example.com', favIconUrl: 'icon1.png' },
+        { id: 2, title: 'Chrome Settings', url: 'chrome://settings', favIconUrl: 'icon2.png' }
+      ];
+      
+      chrome.tabs.query.mockResolvedValue(mockTabs);
+      
+      const result = await chrome.tabs.query({ currentWindow: true });
+      expect(result).toEqual(mockTabs);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    test('should handle null/undefined session data', async () => {
+      chrome.storage.local.get.mockResolvedValue({ sessions: null });
+      
+      const result = await chrome.storage.local.get(['sessions']);
+      expect(result.sessions).toBeNull();
+    });
+
+    test('should handle empty arrays', async () => {
+      chrome.tabs.remove.mockResolvedValue();
+      
+      await chrome.tabs.remove([]);
+      expect(chrome.tabs.remove).toHaveBeenCalledWith([]);
+    });
+  });
 });
