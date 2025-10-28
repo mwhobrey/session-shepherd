@@ -13,7 +13,7 @@
     "lint": "eslint popup/ background/ tests/",
     "lint:fix": "eslint popup/ background/ tests/ --fix",
     "build": "echo 'No build step required for vanilla JS extension'",
-    "package": "zip -r session-shepherd.zip . -x '*.git*' 'node_modules/*' 'tests/*' '*.md' 'package*.json'"
+    "package": "powershell -Command \"Get-ChildItem -Path . -Exclude '.git*','node_modules','tests','*.md','package*.json' | Compress-Archive -DestinationPath 'session-shepherd.zip' -Force\""
   },
   "devDependencies": {
     "@types/chrome": "^0.0.254",
