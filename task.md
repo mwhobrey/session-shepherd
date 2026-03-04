@@ -1,0 +1,22 @@
+- [x] Review manifest permissions and CSP for security issues.
+- [x] Evaluate existing background scripts for tab lifecycle handling.
+- [x] Evaluate popup and dashboard logic for current session management.
+- [x] Identify gaps preventing fully "automated" tab management (e.g., auto-grouping, auto-suspending, rule-based Session saving).
+- [x] Draft evaluation report with security findings and feature proposals.
+- [x] Present findings to the user.
+- [x] Update `manifest.json` permissions (`tabGroups`, `alarms`) and remove insecure `web_accessible_resources`.
+- [x] Implement Auto-Save in `background.js` (using alarms and tab events).
+- [x] Implement Automated Tab Suspension (discarding idle tabs to save memory).
+- [x] Implement Native Chrome Tab Grouping logic for auto-categorization based on domain.
+- [x] Run tests and manually verify the new automated features.
+- [x] Create detailed, logical git commits for the new logic, linting fixes, and test updates.
+- [x] Update `package.json` for macOS build compatibility and package the extension.
+
+## Phase 2: User Interface for Automated Features
+- [x] Create `options/options.html`, `options/options.css`, and `options/options.js` for the settings page.
+- [x] Update `manifest.json` with the `options_ui` configuration.
+- [x] Implement UI controls for Auto-Save toggle and Memory Saver threshold.
+- [x] Implement UI for viewing, adding, and deleting custom Auto-Grouping domain rules.
+- [x] Connect `options.js` to `chrome.storage.local` to robustly save and load settings.
+- [x] Verify background scripts dynamically respect updated configuration values.
+- [x] Commit and package V1.2.0 update.
