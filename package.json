@@ -13,7 +13,7 @@
     "lint": "eslint popup/ background/ tests/",
     "lint:fix": "eslint popup/ background/ tests/ --fix",
     "build": "echo 'No build step required for vanilla JS extension'",
-    "package": "powershell -Command \"Get-ChildItem -Path . -Exclude '.git*','node_modules','tests','*.md','package*.json' | Compress-Archive -DestinationPath 'session-shepherd.zip' -Force\""
+    "package": "zip -r session-shepherd.zip . -x '*.git*' '*node_modules*' '*tests*' '*.md' 'package*.json' '*eslint*' '*.zip'"
   },
   "devDependencies": {
     "@types/chrome": "^0.0.254",
@@ -26,7 +26,9 @@
   },
   "jest": {
     "testEnvironment": "jsdom",
-    "setupFilesAfterEnv": ["<rootDir>/tests/setup.js"],
+    "setupFilesAfterEnv": [
+      "<rootDir>/tests/setup.js"
+    ],
     "testMatch": [
       "<rootDir>/tests/unit/**/*.test.js",
       "<rootDir>/tests/unit/**/*.spec.js"
@@ -38,7 +40,11 @@
       "!**/tests/**"
     ],
     "coverageDirectory": "coverage",
-    "coverageReporters": ["text", "lcov", "html"]
+    "coverageReporters": [
+      "text",
+      "lcov",
+      "html"
+    ]
   },
   "keywords": [
     "chrome-extension",
