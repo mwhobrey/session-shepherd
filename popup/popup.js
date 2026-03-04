@@ -12,7 +12,7 @@ class SessionShepherd {
     this.pendingDeleteId = null;
     this.isOpeningDashboard = false;
     this.currentTheme = 'system'; // Track current theme in class property
-        
+
     this.init();
   }
 
@@ -20,34 +20,34 @@ class SessionShepherd {
     try {
       // Load saved sessions
       await this.loadSessions();
-            
+
       // Load current tabs
       await this.loadCurrentTabs();
-            
+
       // Set up event listeners
       this.setupEventListeners();
-            
+
       // Initialize theme first
       this.initTheme();
-            
+
       // Set up validation
       this.setupValidation();
-        
+
       // Initialize keyboard shortcuts
       this.initKeyboardShortcuts();
-        
+
       // Initialize auto-save
       this.initAutoSave();
-        
+
       // Initialize storage synchronization
       this.initStorageSync();
-        
+
       // Restore last used tab
       this.restoreLastTab();
-            
+
       // Update UI
       this.updateUI();
-            
+
     } catch (error) {
       console.error('Failed to initialize Session Shepherd:', error);
       this.showError('Failed to load extension data');
@@ -58,28 +58,28 @@ class SessionShepherd {
     // Tab switching
     document.getElementById('create-tab').addEventListener('click', () => this.switchTab('create'));
     document.getElementById('sessions-tab').addEventListener('click', () => this.switchTab('sessions'));
-        
+
     // Create tab functionality
     document.getElementById('select-all').addEventListener('click', () => this.selectAllTabs());
     document.getElementById('select-none').addEventListener('click', () => this.selectNoTabs());
     document.getElementById('save-only').addEventListener('click', () => this.saveSession(false));
     document.getElementById('save-close').addEventListener('click', () => this.saveSession(true));
-        
+
     // Theme toggle functionality
     document.getElementById('theme-toggle').addEventListener('click', () => this.toggleTheme());
-        
+
     // Tab search functionality
     document.getElementById('tab-search').addEventListener('input', (e) => this.filterTabs(e.target.value));
     document.getElementById('clear-search').addEventListener('click', () => this.clearTabSearch());
-        
+
     // Session name input
     document.getElementById('session-name').addEventListener('input', (e) => {
       this.validateSessionName(e.target.value);
     });
-        
+
     // Empty state
     document.getElementById('go-to-create').addEventListener('click', () => this.switchTab('create'));
-        
+
     // Manage All Sessions CTA - prevent double-clicking
     const manageButton = document.getElementById('manage-all-sessions');
     if (manageButton && !manageButton.hasAttribute('data-listener-attached')) {
@@ -90,11 +90,11 @@ class SessionShepherd {
         this.openComingSoon();
       });
     }
-        
+
     // Confirmation dialog
     document.getElementById('cancel-delete').addEventListener('click', () => this.hideConfirmationDialog());
     document.getElementById('confirm-delete').addEventListener('click', () => this.confirmDelete());
-        
+
     // Close dialog on overlay click
     document.getElementById('confirmation-dialog').addEventListener('click', (e) => {
       if (e.target.id === 'confirmation-dialog') {
@@ -128,17 +128,17 @@ class SessionShepherd {
 
   switchTab(tabName) {
     console.log('switchTab called with:', tabName); // Debug log
-    
+
     // Update active tab button
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.getElementById(`${tabName}-tab`).classList.add('active');
-        
+
     // Update active content
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
     document.getElementById(`${tabName}-content`).classList.add('active');
-        
+
     this.currentTab = tabName;
-        
+
     // Update UI based on current tab
     if (tabName === 'sessions') {
       console.log('Switching to sessions tab, calling renderSessions'); // Debug log
@@ -172,12 +172,12 @@ class SessionShepherd {
   renderTabsList() {
     const tabsList = document.getElementById('tabs-list');
     tabsList.innerHTML = '';
-        
+
     if (this.currentTabs.length === 0) {
       tabsList.innerHTML = '<div class="empty-state"><p>No tabs found in current window</p></div>';
       return;
     }
-        
+
     this.currentTabs.forEach(tab => {
       const tabElement = this.createTabElement(tab);
       tabsList.appendChild(tabElement);
@@ -188,16 +188,16 @@ class SessionShepherd {
     const div = document.createElement('div');
     div.className = `tab-item ${this.selectedTabIds.has(tab.id) ? 'selected' : ''}`;
     div.dataset.tabId = tab.id;
-        
+
     const faviconUrl = tab.favIconUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOWFhMGE2Ij48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptLTIgMTVsLTUtNSAxLjQxLTEuNDFMMTAgMTQuMTdsNy41OS03LjU5TDE5IDhsLTkgOXoiLz48L3N2Zz4=';
-        
+
     div.innerHTML = `
             <input type="checkbox" class="tab-checkbox" ${this.selectedTabIds.has(tab.id) ? 'checked' : ''}>
             <img src="${faviconUrl}" class="tab-favicon" alt="Favicon">
             <div class="tab-title" title="${tab.title}">${tab.title}</div>
             <div class="tab-url" title="${tab.url}">${this.getDomainFromUrl(tab.url)}</div>
         `;
-        
+
     // Add click handler
     div.addEventListener('click', (e) => {
       if (e.target.type !== 'checkbox') {
@@ -206,13 +206,13 @@ class SessionShepherd {
         this.toggleTabSelection(tab.id, checkbox.checked);
       }
     });
-        
+
     // Add checkbox handler
     const checkbox = div.querySelector('.tab-checkbox');
     checkbox.addEventListener('change', (e) => {
       this.toggleTabSelection(tab.id, e.target.checked);
     });
-        
+
     return div;
   }
 
@@ -222,13 +222,13 @@ class SessionShepherd {
     } else {
       this.selectedTabIds.delete(tabId);
     }
-        
+
     // Update visual state
     const tabElement = document.querySelector(`[data-tab-id="${tabId}"]`);
     if (tabElement) {
       tabElement.classList.toggle('selected', selected);
     }
-        
+
     // Trigger validation
     this.validateTabSelection();
     this.updateSaveButtonStates();
@@ -256,7 +256,7 @@ class SessionShepherd {
     const hasSelection = this.selectedTabIds.size > 0;
     const hasName = document.getElementById('session-name').value.trim().length > 0;
     const canSave = hasSelection && hasName;
-        
+
     document.getElementById('save-only').disabled = !canSave;
     document.getElementById('save-close').disabled = !canSave;
   }
@@ -264,10 +264,10 @@ class SessionShepherd {
   validateSessionName(name) {
     const trimmed = name.trim();
     const isValid = trimmed.length > 0 && trimmed.length <= 50;
-        
+
     // Update button states
     this.updateActionButtons();
-        
+
     return isValid;
   }
 
@@ -275,22 +275,22 @@ class SessionShepherd {
     const sessionName = document.getElementById('session-name').value.trim();
     const category = document.getElementById('session-category').value;
     const tagsInput = document.getElementById('session-tags').value.trim();
-        
+
     if (!sessionName) {
       this.showError('Please enter a session name');
       return;
     }
-        
+
     if (this.selectedTabIds.size === 0) {
       this.showError('Please select at least one tab');
       return;
     }
-        
+
     try {
       // Create session object
       const selectedTabs = this.currentTabs.filter(tab => this.selectedTabIds.has(tab.id));
       const tags = tagsInput ? tagsInput.split(',').map(tag => tag.trim()).filter(tag => tag.length > 0) : [];
-      
+
       const session = {
         id: Date.now(),
         name: sessionName,
@@ -303,28 +303,28 @@ class SessionShepherd {
         })),
         createdAt: new Date().toISOString()
       };
-            
+
       // Save to storage
       this.sessions.push(session);
       await chrome.storage.local.set({ sessions: this.sessions });
-            
+
       // Close tabs if requested
       if (closeTabs) {
         await this.closeSelectedTabs();
       }
-            
+
       // Reset form
       document.getElementById('session-name').value = '';
       document.getElementById('session-category').value = 'work';
       document.getElementById('session-tags').value = '';
       this.selectAllTabs();
-            
+
       // Switch to sessions tab
       this.switchTab('sessions');
-            
+
       // Show success message
       this.showSuccess(`Session "${sessionName}" saved successfully`);
-            
+
     } catch (error) {
       console.error('Failed to save session:', error);
       this.showError('Failed to save session');
@@ -333,7 +333,7 @@ class SessionShepherd {
 
   async closeSelectedTabs() {
     const tabsToClose = Array.from(this.selectedTabIds);
-        
+
     // Check if we're about to close all tabs in the window
     if (tabsToClose.length === this.currentTabs.length) {
       // Navigate to new tab page instead of closing the window
@@ -345,41 +345,41 @@ class SessionShepherd {
     }
   }
 
-  renderSessions() {
+  renderSessions(sessionsToRender = this.sessions) {
     console.log('renderSessions called - NEW VERSION'); // Debug log
-    console.log('Sessions array:', this.sessions); // Debug log
+    console.log('Sessions array:', sessionsToRender); // Debug log
     const sessionsList = document.getElementById('sessions-list');
     const emptyState = document.getElementById('empty-state');
-        
+
     console.log('sessionsList element:', sessionsList); // Debug log
     console.log('emptyState element:', emptyState); // Debug log
-        
+
     if (!sessionsList || !emptyState) {
       console.error('Required DOM elements not found');
       return;
     }
-        
-    if (this.sessions.length === 0) {
+
+    if (sessionsToRender.length === 0) {
       console.log('No sessions found, showing empty state'); // Debug log
       sessionsList.style.display = 'none';
       emptyState.style.display = 'flex';
       return;
     }
-        
-    console.log('Rendering sessions, count:', this.sessions.length); // Debug log
+
+    console.log('Rendering sessions, count:', sessionsToRender.length); // Debug log
     sessionsList.style.display = 'block';
     emptyState.style.display = 'none';
-        
+
     sessionsList.innerHTML = '';
-        
-    this.sessions.forEach((session, index) => {
+
+    sessionsToRender.forEach((session, index) => {
       console.log(`Creating session card ${index + 1}:`, session.name); // Debug log
       const sessionCard = this.createSessionCard(session);
       console.log('Session card created:', sessionCard); // Debug log
       sessionsList.appendChild(sessionCard);
       console.log('Session card appended to DOM'); // Debug log
     });
-    
+
     console.log('Final sessionsList innerHTML length:', sessionsList.innerHTML.length); // Debug log
     console.log('Final sessionsList children count:', sessionsList.children.length); // Debug log
   }
@@ -388,10 +388,10 @@ class SessionShepherd {
     const div = document.createElement('div');
     div.className = 'session-card';
     div.dataset.sessionId = session.id;
-        
+
     // Create tab preview (up to 5 tabs)
     const tabPreview = this.createTabPreview(session.tabs);
-        
+
     div.innerHTML = `
             <div class="session-header">
                 <div>
@@ -444,21 +444,21 @@ class SessionShepherd {
                 </button>
             </div>
         `;
-        
+
     // Add event listeners
     div.querySelector('[data-action="restore"]').addEventListener('click', () => {
       const restoreMode = div.querySelector('.restore-mode-select').value;
       this.restoreSession(session, restoreMode);
     });
-        
+
     div.querySelector('[data-action="delete"]').addEventListener('click', () => {
       this.showConfirmationDialog(session.id);
     });
-        
+
     div.querySelector('[data-action="expand"]').addEventListener('click', () => {
       this.toggleSessionDetails(div);
     });
-        
+
     return div;
   }
 
@@ -466,14 +466,14 @@ class SessionShepherd {
     const maxTabs = 5;
     const previewTabs = tabs.slice(0, maxTabs);
     const remainingCount = tabs.length - maxTabs;
-        
+
     let previewHtml = '';
-        
+
     previewTabs.forEach(tab => {
       const faviconUrl = tab.favIconUrl || 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxNiIgaGVpZ2h0PSIxNiIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSIjOWFhMGE2Ij48cGF0aCBkPSJNMTIgMkM2LjQ4IDIgMiA2LjQ4IDIgMTJzNC40OCAxMCAxMCAxMCAxMC00LjQ4IDEwLTEwUzE3LjUyIDIgMTIgMnptLTIgMTVsLTUtNSAxLjQxLTEuNDFMMTAgMTQuMTdsNy41OS03LjU5TDE5IDhsLTkgOXoiLz48L3N2Zz4=';
       // const domain = this.getDomainFromUrl(tab.url); // Future use
-      const truncatedTitle = tab.title.length > 15 ? `${tab.title.substring(0, 15)  }...` : tab.title;
-            
+      const truncatedTitle = tab.title.length > 15 ? `${tab.title.substring(0, 15)}...` : tab.title;
+
       previewHtml += `
                 <div class="tab-preview-item" title="${this.escapeHtml(tab.title)}">
                     <img src="${faviconUrl}" class="tab-preview-icon" alt="Favicon">
@@ -481,7 +481,7 @@ class SessionShepherd {
                 </div>
             `;
     });
-        
+
     // Add overflow indicator if there are more tabs
     if (remainingCount > 0) {
       previewHtml += `
@@ -490,7 +490,7 @@ class SessionShepherd {
                 </div>
             `;
     }
-        
+
     return previewHtml;
   }
 
@@ -547,26 +547,26 @@ class SessionShepherd {
 
   async confirmDelete() {
     if (!this.pendingDeleteId) return;
-        
+
     try {
       // Remove session from array
       this.sessions = this.sessions.filter(session => session.id !== this.pendingDeleteId);
-            
+
       // Update storage
       await chrome.storage.local.set({ sessions: this.sessions });
-            
+
       // Update UI
       if (typeof this.renderSessions === 'function') {
-      this.renderSessions();
-    } else {
-      console.error('renderSessions function not found!');
-    }
-            
+        this.renderSessions();
+      } else {
+        console.error('renderSessions function not found!');
+      }
+
       // Hide dialog
       this.hideConfirmationDialog();
-            
+
       this.showSuccess('Session deleted successfully');
-            
+
     } catch (error) {
       console.error('Failed to delete session:', error);
       this.showError('Failed to delete session');
@@ -602,7 +602,7 @@ class SessionShepherd {
           this.updateSaveButtonStates();
         });
       }
-        
+
       // Validate tab selection when tabs change
       this.validateTabSelection();
       this.updateSaveButtonStates();
@@ -614,15 +614,15 @@ class SessionShepherd {
   validateSessionName() {
     const sessionNameInput = document.getElementById('session-name');
     if (!sessionNameInput) return false;
-        
+
     const sessionName = sessionNameInput.value.trim();
-        
+
     // Clear previous validation state
     this.clearValidationState(sessionNameInput);
-        
+
     let isValid = true;
     let errorMessage = '';
-        
+
     // Required field
     if (!sessionName) {
       isValid = false;
@@ -643,10 +643,10 @@ class SessionShepherd {
       isValid = false;
       errorMessage = 'Session name can only contain letters, numbers, spaces, hyphens, and underscores';
     }
-        
+
     // Update UI based on validation
     this.updateValidationState(sessionNameInput, isValid, errorMessage);
-        
+
     return isValid;
   }
 
@@ -654,31 +654,31 @@ class SessionShepherd {
     const hasSelection = this.selectedTabIds.size > 0;
     const maxTabs = 50; // Performance limit
     const isValid = hasSelection && this.selectedTabIds.size <= maxTabs;
-        
+
     return isValid;
   }
 
   updateValidationState(input, isValid, errorMessage) {
     if (!input) return;
-        
+
     const inputGroup = input.closest('.input-group');
     if (!inputGroup) return;
-        
+
     const errorElement = inputGroup.querySelector('.error-message');
-        
+
     // Remove existing error message
     if (errorElement) {
       errorElement.remove();
     }
-        
+
     // Update input styling
     input.classList.remove('valid', 'invalid');
-        
+
     if (isValid) {
       input.classList.add('valid');
     } else {
       input.classList.add('invalid');
-            
+
       // Add error message
       const errorDiv = document.createElement('div');
       errorDiv.className = 'error-message';
@@ -689,7 +689,7 @@ class SessionShepherd {
 
   clearValidationState(input) {
     if (!input) return;
-        
+
     const inputGroup = input.closest('.input-group');
     if (inputGroup) {
       const errorElement = inputGroup.querySelector('.error-message');
@@ -697,7 +697,7 @@ class SessionShepherd {
         errorElement.remove();
       }
     }
-        
+
     input.classList.remove('valid', 'invalid');
   }
 
@@ -708,15 +708,15 @@ class SessionShepherd {
     const sessionNameValid = sessionName.length >= 3 && sessionName.length <= 50 && /^[a-zA-Z0-9\s\-_]+$/.test(sessionName);
     const tabSelectionValid = this.selectedTabIds.size > 0 && this.selectedTabIds.size <= 50;
     const canSave = sessionNameValid && tabSelectionValid;
-        
+
     const saveOnlyBtn = document.getElementById('save-only');
     const saveCloseBtn = document.getElementById('save-close');
-        
+
     if (saveOnlyBtn) {
       saveOnlyBtn.disabled = !canSave;
       saveOnlyBtn.classList.toggle('disabled', !canSave);
     }
-        
+
     if (saveCloseBtn) {
       saveCloseBtn.disabled = !canSave;
       saveCloseBtn.classList.toggle('disabled', !canSave);
@@ -749,17 +749,17 @@ class SessionShepherd {
       console.log('Dashboard already opening, ignoring duplicate click');
       return;
     }
-    
+
     this.isOpeningDashboard = true;
     console.log('Opening dashboard...');
-    
+
     // Disable the button temporarily to prevent multiple clicks
     const button = document.getElementById('manage-all-sessions');
     if (button) {
       button.disabled = true;
       button.style.opacity = '0.6';
     }
-    
+
     // Open the full-page dashboard in a new tab
     chrome.tabs.create({ url: chrome.runtime.getURL('dashboard/dashboard.html') })
       .then(() => {
@@ -787,12 +787,12 @@ class SessionShepherd {
   applyDomainFilter() {
     const filterInput = document.getElementById('domain-filter');
     const pattern = filterInput.value.trim();
-        
+
     if (!pattern) {
       this.clearDomainFilter();
       return;
     }
-        
+
     try {
       const matchingTabs = this.currentTabs.filter(tab => this.matchesDomainPattern(tab.url, pattern));
       this.updateTabSelectionFromFilter(matchingTabs);
@@ -825,12 +825,12 @@ class SessionShepherd {
   updateTabSelectionFromFilter(matchingTabs) {
     // Clear current selection
     this.selectedTabIds.clear();
-        
+
     // Select only matching tabs
     matchingTabs.forEach(tab => {
       this.selectedTabIds.add(tab.id);
     });
-        
+
     // Update UI
     this.renderTabsList();
     this.validateTabSelection();
@@ -859,21 +859,21 @@ class SessionShepherd {
 
   async toggleTheme() {
     let newTheme;
-        
+
     switch (this.currentTheme) {
-    case 'light':
-      newTheme = 'dark';
-      break;
-    case 'dark':
-      newTheme = 'system';
-      break;
-    default:
-      newTheme = 'light';
+      case 'light':
+        newTheme = 'dark';
+        break;
+      case 'dark':
+        newTheme = 'system';
+        break;
+      default:
+        newTheme = 'light';
     }
-    
+
     this.currentTheme = newTheme; // Update class property
     this.applyTheme(newTheme);
-        
+
     try {
       await chrome.storage.local.set({ theme: newTheme });
     } catch (error) {
@@ -884,29 +884,29 @@ class SessionShepherd {
   applyTheme(theme) {
     const body = document.body;
     const themeIcon = document.querySelector('#theme-toggle .material-icons');
-        
+
     // Remove existing theme classes
     body.classList.remove('theme-light', 'theme-dark', 'theme-system');
-        
+
     // Apply new theme
     body.classList.add(`theme-${theme}`);
     document.documentElement.setAttribute('data-theme', theme);
-        
+
     // Update icon
     if (themeIcon) {
       switch (theme) {
-      case 'light':
-        themeIcon.textContent = 'light_mode';
-        break;
-      case 'dark':
-        themeIcon.textContent = 'dark_mode';
-        break;
-      case 'system':
-        themeIcon.textContent = 'brightness_auto';
-        break;
+        case 'light':
+          themeIcon.textContent = 'light_mode';
+          break;
+        case 'dark':
+          themeIcon.textContent = 'dark_mode';
+          break;
+        case 'system':
+          themeIcon.textContent = 'brightness_auto';
+          break;
       }
     }
-        
+
     // Apply system theme detection
     if (theme === 'system') {
       this.detectSystemTheme();
@@ -916,7 +916,7 @@ class SessionShepherd {
   detectSystemTheme() {
     const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const body = document.body;
-        
+
     if (prefersDark) {
       body.classList.add('theme-dark');
       body.classList.remove('theme-light');
@@ -1023,14 +1023,14 @@ class SessionShepherd {
           return;
         }
       }
-            
+
       // Close keyboard help dialog if open
       const keyboardDialog = document.getElementById('keyboard-help-dialog');
       if (keyboardDialog && keyboardDialog.style.display !== 'none') {
         this.hideKeyboardHelp();
         return;
       }
-            
+
       // Close confirmation dialog if open
       const dialog = document.getElementById('confirmation-dialog');
       if (dialog && dialog.style.display !== 'none') {
@@ -1045,7 +1045,7 @@ class SessionShepherd {
       if (document.activeElement === sessionNameInput && sessionNameInput.value.trim()) {
         event.preventDefault();
         this.saveSession(false);
-                
+
       }
     }
   }
@@ -1054,20 +1054,20 @@ class SessionShepherd {
   filterTabs(searchTerm) {
     const term = searchTerm.toLowerCase().trim();
     const searchResultsCount = document.getElementById('search-results-count');
-        
+
     if (!term) {
       // Show all tabs
       this.renderTabsList();
       searchResultsCount.textContent = 'Showing all tabs';
       return;
     }
-        
+
     // Filter tabs based on search term
-    const filteredTabs = this.currentTabs.filter(tab => 
-      tab.title.toLowerCase().includes(term) || 
-            tab.url.toLowerCase().includes(term)
+    const filteredTabs = this.currentTabs.filter(tab =>
+      tab.title.toLowerCase().includes(term) ||
+      tab.url.toLowerCase().includes(term)
     );
-        
+
     // Update UI with filtered results
     this.renderFilteredTabsList(filteredTabs);
     searchResultsCount.textContent = `Showing ${filteredTabs.length} of ${this.currentTabs.length} tabs`;
@@ -1076,30 +1076,30 @@ class SessionShepherd {
   renderFilteredTabsList(filteredTabs) {
     const tabsList = document.getElementById('tabs-list');
     tabsList.innerHTML = '';
-        
+
     if (filteredTabs.length === 0) {
       tabsList.innerHTML = '<div class="no-results">No tabs match your search</div>';
       return;
     }
-        
+
     // Update selectedTabIds to only include filtered tabs that were previously selected
     const filteredTabIds = new Set(filteredTabs.map(tab => tab.id));
     const newSelectedTabIds = new Set();
-    
+
     // Only keep tabs that are both filtered AND previously selected
     this.selectedTabIds.forEach(tabId => {
       if (filteredTabIds.has(tabId)) {
         newSelectedTabIds.add(tabId);
       }
     });
-    
+
     this.selectedTabIds = newSelectedTabIds;
-        
+
     filteredTabs.forEach(tab => {
       const tabElement = this.createTabElement(tab);
       tabsList.appendChild(tabElement);
     });
-    
+
     // Update validation and button states
     this.validateTabSelection();
     this.updateSaveButtonStates();
@@ -1119,7 +1119,7 @@ class SessionShepherd {
     const details = sessionCard.querySelector('.session-details');
     const expandButton = sessionCard.querySelector('[data-action="expand"]');
     const expandIcon = expandButton.querySelector('.material-icons');
-        
+
     if (details.style.display === 'none') {
       details.style.display = 'block';
       expandIcon.textContent = 'expand_less';
@@ -1137,23 +1137,23 @@ class SessionShepherd {
     const tagFilterElement = document.getElementById('tag-filter');
     const categoryFilter = categoryFilterElement ? categoryFilterElement.value : '';
     const tagFilter = tagFilterElement ? tagFilterElement.value.trim().toLowerCase() : '';
-        
+
     const filteredSessions = this.sessions.filter(session => {
       // Category filter
       if (categoryFilter && session.category !== categoryFilter) {
         return false;
       }
-            
+
       // Tag filter
       if (tagFilter && !session.tags.some(tag => tag.toLowerCase().includes(tagFilter))) {
         return false;
       }
-            
+
       return true;
     });
-        
+
     if (typeof this.renderSessions === 'function') {
-      this.renderSessions();
+      this.renderSessions(filteredSessions);
     } else {
       console.error('renderSessions function not found!');
     }
@@ -1191,7 +1191,7 @@ class SessionShepherd {
       const dataStr = JSON.stringify(exportData, null, 2);
       const dataBlob = new Blob([dataStr], { type: 'application/json' });
       const url = URL.createObjectURL(dataBlob);
-            
+
       const link = document.createElement('a');
       link.href = url;
       link.download = `session-shepherd-export-${new Date().toISOString().split('T')[0]}.json`;
@@ -1229,7 +1229,7 @@ class SessionShepherd {
       // Show import confirmation
       const sessionCount = importData.sessions.length;
       const confirmMessage = `Import ${sessionCount} sessions? This will add them to your existing sessions.`;
-            
+
       if (confirm(confirmMessage)) {
         await this.performImport(importData.sessions);
       }
@@ -1252,14 +1252,14 @@ class SessionShepherd {
   }
 
   validateImportData(data) {
-    return data && 
-               typeof data === 'object' && 
-               Array.isArray(data.sessions) &&
-               data.sessions.every(session => 
-                 session.id && 
-                   session.name && 
-                   Array.isArray(session.tabs)
-               );
+    return data &&
+      typeof data === 'object' &&
+      Array.isArray(data.sessions) &&
+      data.sessions.every(session =>
+        session.id &&
+        session.name &&
+        Array.isArray(session.tabs)
+      );
   }
 
   async performImport(importedSessions) {
@@ -1273,17 +1273,17 @@ class SessionShepherd {
 
       // Add imported sessions to existing sessions
       this.sessions = [...this.sessions, ...newSessions];
-            
+
       // Save to storage
       await chrome.storage.local.set({ sessions: this.sessions });
-            
+
       // Update UI
       if (typeof this.renderSessions === 'function') {
-      this.renderSessions();
-    } else {
-      console.error('renderSessions function not found!');
-    }
-            
+        this.renderSessions();
+      } else {
+        console.error('renderSessions function not found!');
+      }
+
       this.showSuccess(`Successfully imported ${newSessions.length} sessions`);
     } catch (error) {
       console.error('Import save failed:', error);
@@ -1317,7 +1317,7 @@ class SessionShepherd {
       interval: 60, // seconds
       maxSessions: 10
     };
-        
+
     // Load auto-save settings
     this.loadAutoSaveSettings();
   }
@@ -1328,7 +1328,7 @@ class SessionShepherd {
       if (result.autoSaveSettings) {
         this.autoSaveSettings = { ...this.autoSaveSettings, ...result.autoSaveSettings };
       }
-            
+
       // Update UI
       this.updateAutoSaveUI();
     } catch (error) {
@@ -1341,19 +1341,19 @@ class SessionShepherd {
     const optionsDiv = document.getElementById('auto-save-options');
     const intervalSelect = document.getElementById('auto-save-interval');
     const maxSessionsSelect = document.getElementById('auto-save-max-sessions');
-        
+
     if (enabledCheckbox) {
       enabledCheckbox.checked = this.autoSaveSettings.enabled;
     }
-        
+
     if (optionsDiv) {
       optionsDiv.style.display = this.autoSaveSettings.enabled ? 'flex' : 'none';
     }
-        
+
     if (intervalSelect) {
       intervalSelect.value = this.autoSaveSettings.interval;
     }
-        
+
     if (maxSessionsSelect) {
       maxSessionsSelect.value = this.autoSaveSettings.maxSessions;
     }
@@ -1361,16 +1361,16 @@ class SessionShepherd {
 
   async toggleAutoSave(enabled) {
     this.autoSaveSettings.enabled = enabled;
-        
+
     // Update UI
     const optionsDiv = document.getElementById('auto-save-options');
     if (optionsDiv) {
       optionsDiv.style.display = enabled ? 'flex' : 'none';
     }
-        
+
     // Save settings
     await this.saveAutoSaveSettings();
-        
+
     // Start or stop auto-save timer
     if (enabled) {
       this.startAutoSaveTimer();
@@ -1382,18 +1382,18 @@ class SessionShepherd {
   async updateAutoSaveSettings() {
     const intervalSelect = document.getElementById('auto-save-interval');
     const maxSessionsSelect = document.getElementById('auto-save-max-sessions');
-        
+
     if (intervalSelect) {
       this.autoSaveSettings.interval = parseInt(intervalSelect.value);
     }
-        
+
     if (maxSessionsSelect) {
       this.autoSaveSettings.maxSessions = parseInt(maxSessionsSelect.value);
     }
-        
+
     // Save settings
     await this.saveAutoSaveSettings();
-        
+
     // Restart timer if auto-save is enabled
     if (this.autoSaveSettings.enabled) {
       this.startAutoSaveTimer();
@@ -1410,9 +1410,9 @@ class SessionShepherd {
 
   startAutoSaveTimer() {
     this.stopAutoSaveTimer(); // Clear existing timer
-        
+
     if (!this.autoSaveSettings.enabled) return;
-        
+
     const intervalMs = this.autoSaveSettings.interval * 1000;
     this.autoSaveTimer = setInterval(() => {
       this.performAutoSave();
@@ -1432,13 +1432,13 @@ class SessionShepherd {
       if (this.currentTab !== 'create' || this.selectedTabIds.size === 0) {
         return;
       }
-            
+
       // Get current tabs
       const tabs = await chrome.tabs.query({ currentWindow: true });
       const selectedTabs = tabs.filter(tab => this.selectedTabIds.has(tab.id));
-            
+
       if (selectedTabs.length === 0) return;
-            
+
       // Create auto-save session
       const autoSaveSession = {
         id: `autosave_${Date.now()}`,
@@ -1453,25 +1453,25 @@ class SessionShepherd {
         createdAt: new Date().toISOString(),
         isAutoSave: true
       };
-            
+
       // Add to sessions
       this.sessions.push(autoSaveSession);
-            
+
       // Clean up old auto-save sessions
       await this.cleanupAutoSaveSessions();
-            
+
       // Save to storage
       await chrome.storage.local.set({ sessions: this.sessions });
-            
+
       // Update UI if we're on sessions tab
       if (this.currentTab === 'sessions') {
         if (typeof this.renderSessions === 'function') {
-      this.renderSessions();
-    } else {
-      console.error('renderSessions function not found!');
-    }
+          this.renderSessions();
+        } else {
+          console.error('renderSessions function not found!');
+        }
       }
-            
+
       console.log('Auto-save completed');
     } catch (error) {
       console.error('Auto-save failed:', error);
@@ -1480,14 +1480,14 @@ class SessionShepherd {
 
   async cleanupAutoSaveSessions() {
     const autoSaveSessions = this.sessions.filter(session => session.isAutoSave);
-        
+
     if (autoSaveSessions.length > this.autoSaveSettings.maxSessions) {
       // Sort by creation date and remove oldest
       autoSaveSessions.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-            
+
       const sessionsToRemove = autoSaveSessions.slice(0, autoSaveSessions.length - this.autoSaveSettings.maxSessions);
       const sessionIdsToRemove = sessionsToRemove.map(session => session.id);
-            
+
       this.sessions = this.sessions.filter(session => !sessionIdsToRemove.includes(session.id));
     }
   }
@@ -1506,7 +1506,7 @@ console.log('renderSessions function exists:', typeof SessionShepherd.prototype.
 // Fallback function in case of issues
 if (typeof SessionShepherd.prototype.renderSessions !== 'function') {
   console.error('CRITICAL: renderSessions function is missing!');
-  SessionShepherd.prototype.renderSessions = function() {
+  SessionShepherd.prototype.renderSessions = function () {
     console.log('FALLBACK renderSessions called');
     const sessionsList = document.getElementById('sessions-list');
     const emptyState = document.getElementById('empty-state');
