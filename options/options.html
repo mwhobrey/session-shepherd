@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Shepherd - Settings</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="stylesheet" href="../assets/css/toast.css">
+    <link rel="stylesheet" href="options.css">
+</head>
+<body>
+    <header class="options-header">
+        <div class="header-content">
+            <div class="header-left">
+                <div class="logo">
+                    <img src="../assets/icons/icon.svg" alt="Session Shepherd" class="logo-icon">
+                    <h1>Session Shepherd</h1>
+                </div>
+                <p class="header-subtitle">Settings & Automation</p>
+            </div>
+        </div>
+    </header>
+
+    <main class="options-main">
+        <div class="settings-container">
+            
+            <section class="settings-section">
+                <div class="section-header">
+                    <h2><span class="material-icons">memory</span> Memory Saver (Auto-Suspend)</h2>
+                </div>
+                <p class="section-description">Automatically suspend inactive tabs from memory to keep your browser fast. Tabs remain visible in your tab bar and reload when clicked.</p>
+                
+                <div class="setting-item">
+                    <label for="suspend-threshold">Suspend tabs idle for longer than:</label>
+                    <div class="select-wrapper">
+                        <select id="suspend-threshold">
+                            <option value="15">15 Minutes</option>
+                            <option value="30">30 Minutes</option>
+                            <option value="60">1 Hour (Suggested)</option>
+                            <option value="120">2 Hours</option>
+                            <option value="480">8 Hours</option>
+                            <option value="0">Never (Disable Memory Saver)</option>
+                        </select>
+                        <span class="material-icons select-icon">expand_more</span>
+                    </div>
+                </div>
+            </section>
+
+            <section class="settings-section">
+                <div class="section-header">
+                    <h2><span class="material-icons">folder_special</span> Smart Tab Grouping</h2>
+                </div>
+                <p class="section-description">Automatically organize your tabs into Chrome Tab Groups based on the domain rules below.</p>
+                
+                <div class="rules-container">
+                    <div class="add-rule-form">
+                        <input type="text" id="new-rule-domain" placeholder="Domain (e.g., github.com)" required>
+                        <input type="text" id="new-rule-group" placeholder="Group Name (e.g., Development)" required>
+                        <button id="add-rule-btn" class="button filled primary">
+                            <span class="material-icons">add</span> Add Rule
+                        </button>
+                    </div>
+
+                    <div class="rules-list-container">
+                        <table class="rules-table">
+                            <thead>
+                                <tr>
+                                    <th>Domain</th>
+                                    <th>Tab Group Name</th>
+                                    <th class="actions-col">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="rules-table-body">
+                                <!-- Rules dynamically injected here -->
+                            </tbody>
+                        </table>
+                        <div id="no-rules-message" class="empty-state hidden">
+                            <p>No grouping rules configured. Add a rule above to start automatically organizing your tabs!</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </main>
+
+    <script src="../assets/js/toast.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>
