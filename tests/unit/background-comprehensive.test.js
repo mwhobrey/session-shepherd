@@ -9,13 +9,26 @@ global.chrome = {
     query: jest.fn(),
     remove: jest.fn(),
     create: jest.fn(),
+    group: jest.fn(),
+    discard: jest.fn(),
     onUpdated: {
       addListener: jest.fn()
     }
   },
   windows: {
     create: jest.fn(),
+    getAll: jest.fn(),
     onFocusChanged: {
+      addListener: jest.fn()
+    }
+  },
+  tabGroups: {
+    query: jest.fn(),
+    update: jest.fn()
+  },
+  alarms: {
+    create: jest.fn(),
+    onAlarm: {
       addListener: jest.fn()
     }
   },
@@ -75,12 +88,12 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should initialize storage on installation', async () => {
       chrome.storage.local.get.mockResolvedValue({});
       chrome.storage.local.set.mockResolvedValue();
-      
+
       // Simulate storage initialization
       await chrome.storage.local.get(['sessions', 'lastTab']);
       await chrome.storage.local.set({ sessions: [] });
       await chrome.storage.local.set({ lastTab: 'create' });
-      
+
       expect(chrome.storage.local.get).toHaveBeenCalledWith(['sessions', 'lastTab']);
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ sessions: [] });
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ lastTab: 'create' });
@@ -91,13 +104,13 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle getSessions message', async () => {
       const mockSessions = [{ id: 1, name: 'Test Session', tabs: [] }];
       chrome.storage.local.get.mockResolvedValue({ sessions: mockSessions });
-      
+
       const result = await chrome.storage.local.get(['sessions']);
       const response = {
         success: true,
         sessions: result.sessions || []
       };
-      
+
       expect(response.success).toBe(true);
       expect(response.sessions).toEqual(mockSessions);
     });
@@ -108,14 +121,14 @@ describe('Background Service Worker Comprehensive Tests', () => {
         name: 'Test Session',
         tabs: [{ title: 'Google', url: 'https://google.com' }]
       };
-      
+
       chrome.storage.local.get.mockResolvedValue({ sessions: [] });
       chrome.storage.local.set.mockResolvedValue();
-      
+
       const sessions = [];
       sessions.push(mockSession);
       await chrome.storage.local.set({ sessions });
-      
+
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ sessions: [mockSession] });
     });
 
@@ -125,13 +138,13 @@ describe('Background Service Worker Comprehensive Tests', () => {
         { id: 1, name: 'Session 1', tabs: [] },
         { id: 2, name: 'Session 2', tabs: [] }
       ];
-      
+
       chrome.storage.local.get.mockResolvedValue({ sessions: mockSessions });
       chrome.storage.local.set.mockResolvedValue();
-      
+
       const updatedSessions = mockSessions.filter(session => session.id !== sessionId);
       await chrome.storage.local.set({ sessions: updatedSessions });
-      
+
       expect(updatedSessions).toHaveLength(1);
       expect(updatedSessions[0].id).toBe(2);
     });
@@ -145,15 +158,15 @@ describe('Background Service Worker Comprehensive Tests', () => {
           { title: 'GitHub', url: 'https://github.com' }
         ]
       };
-      
+
       const mockWindow = { id: 1 };
       chrome.windows.create.mockResolvedValue(mockWindow);
-      
+
       const window = await chrome.windows.create({
         url: mockSession.tabs.map(tab => tab.url),
         focused: true
       });
-      
+
       expect(chrome.windows.create).toHaveBeenCalledWith({
         url: ['https://google.com', 'https://github.com'],
         focused: true
@@ -166,7 +179,7 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle storage errors gracefully', async () => {
       const error = new Error('Storage error');
       chrome.storage.local.get.mockRejectedValue(error);
-      
+
       try {
         await chrome.storage.local.get(['sessions']);
       } catch (e) {
@@ -177,7 +190,7 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle window creation errors', async () => {
       const error = new Error('Window creation failed');
       chrome.windows.create.mockRejectedValue(error);
-      
+
       try {
         await chrome.windows.create({ url: ['https://google.com'] });
       } catch (e) {
@@ -188,11 +201,11 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle unknown message actions', () => {
       // const unknownAction = 'unknownAction';
       const sendResponse = jest.fn();
-      
+
       // Simulate unknown action
       const response = { success: false, error: 'Unknown action' };
       sendResponse(response);
-      
+
       expect(sendResponse).toHaveBeenCalledWith(response);
     });
   });
@@ -200,20 +213,20 @@ describe('Background Service Worker Comprehensive Tests', () => {
   describe('Keep-Alive Functionality', () => {
     test('should implement keep-alive mechanism', () => {
       let keepAliveInterval;
-      
+
       const keepAlive = () => {
         if (keepAliveInterval) {
           clearInterval(keepAliveInterval);
         }
-        
+
         keepAliveInterval = setInterval(() => {
-          chrome.runtime.getPlatformInfo(() => {});
+          chrome.runtime.getPlatformInfo(() => { });
         }, 20000);
       };
-      
+
       // Test that keep-alive can be started
       expect(() => keepAlive()).not.toThrow();
-      
+
       // Clean up
       if (keepAliveInterval) {
         clearInterval(keepAliveInterval);
@@ -292,13 +305,13 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle successful message responses', async () => {
       const mockSessions = [{ id: 1, name: 'Test Session', tabs: [] }];
       chrome.storage.local.get.mockResolvedValue({ sessions: mockSessions });
-      
+
       const result = await chrome.storage.local.get(['sessions']);
       const response = {
         success: true,
         sessions: result.sessions || []
       };
-      
+
       expect(response.success).toBe(true);
       expect(response.sessions).toEqual(mockSessions);
     });
@@ -306,7 +319,7 @@ describe('Background Service Worker Comprehensive Tests', () => {
     test('should handle failed message responses', async () => {
       const error = new Error('Operation failed');
       chrome.storage.local.get.mockRejectedValue(error);
-      
+
       try {
         await chrome.storage.local.get(['sessions']);
       } catch (e) {
@@ -314,7 +327,7 @@ describe('Background Service Worker Comprehensive Tests', () => {
           success: false,
           error: e.message
         };
-        
+
         expect(response.success).toBe(false);
         expect(response.error).toBe('Operation failed');
       }
@@ -329,49 +342,49 @@ describe('Background Service Worker Comprehensive Tests', () => {
         tabs: [{ title: 'Tab', url: 'https://example.com' }],
         createdAt: new Date().toISOString()
       }));
-      
+
       chrome.storage.local.get.mockResolvedValue({ sessions: largeSessionSet });
       chrome.storage.local.set.mockResolvedValue();
-      
+
       const startTime = performance.now();
-      
+
       const result = await chrome.storage.local.get(['sessions']);
       await chrome.storage.local.set({ sessions: result.sessions });
-      
+
       const endTime = performance.now();
       const executionTime = endTime - startTime;
-      
+
       expect(executionTime).toBeLessThan(100); // Should be fast
       expect(result.sessions.length).toBe(100);
     });
 
     test('should handle concurrent operations', async () => {
-      const operations = Array.from({ length: 10 }, (_, i) => 
+      const operations = Array.from({ length: 10 }, (_, i) =>
         chrome.storage.local.set({ [`key${i}`]: `value${i}` })
       );
-      
+
       const startTime = performance.now();
-      
+
       await Promise.all(operations);
-      
+
       const endTime = performance.now();
       const executionTime = endTime - startTime;
-      
+
       expect(executionTime).toBeLessThan(1000); // Should complete within 1 second
       expect(chrome.storage.local.set).toHaveBeenCalledTimes(10);
     });
   });
 
-          describe('Message Handling', () => {
-            test('should have message listener available', () => {
-              expect(chrome.runtime.onMessage.addListener).toBeDefined();
-            });
-          });
+  describe('Message Handling', () => {
+    test('should have message listener available', () => {
+      expect(chrome.runtime.onMessage.addListener).toBeDefined();
+    });
+  });
 
   describe('Error Handling', () => {
     test('should handle storage errors gracefully', async () => {
       chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
-      
+
       // Test that storage operations don't crash the extension
       try {
         await chrome.storage.local.get(['sessions']);
@@ -387,14 +400,14 @@ describe('Background Service Worker Comprehensive Tests', () => {
         { id: '1', name: 'Session 1', tabs: [] },
         { id: '2', name: 'Session 2', tabs: [] }
       ];
-      
+
       chrome.storage.local.get.mockResolvedValue({ sessions: mockSessions });
       chrome.storage.local.set.mockResolvedValue();
-      
+
       // Test basic storage operations
       const result = await chrome.storage.local.get(['sessions']);
       expect(result.sessions).toEqual(mockSessions);
-      
+
       await chrome.storage.local.set({ sessions: mockSessions });
       expect(chrome.storage.local.set).toHaveBeenCalledWith({ sessions: mockSessions });
     });
@@ -406,9 +419,9 @@ describe('Background Service Worker Comprehensive Tests', () => {
         { id: 1, title: 'Regular Tab', url: 'https://example.com', favIconUrl: 'icon1.png' },
         { id: 2, title: 'Chrome Settings', url: 'chrome://settings', favIconUrl: 'icon2.png' }
       ];
-      
+
       chrome.tabs.query.mockResolvedValue(mockTabs);
-      
+
       const result = await chrome.tabs.query({ currentWindow: true });
       expect(result).toEqual(mockTabs);
     });
@@ -417,14 +430,14 @@ describe('Background Service Worker Comprehensive Tests', () => {
   describe('Edge Cases', () => {
     test('should handle null/undefined session data', async () => {
       chrome.storage.local.get.mockResolvedValue({ sessions: null });
-      
+
       const result = await chrome.storage.local.get(['sessions']);
       expect(result.sessions).toBeNull();
     });
 
     test('should handle empty arrays', async () => {
       chrome.tabs.remove.mockResolvedValue();
-      
+
       await chrome.tabs.remove([]);
       expect(chrome.tabs.remove).toHaveBeenCalledWith([]);
     });

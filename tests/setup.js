@@ -8,10 +8,29 @@ global.chrome = {
   tabs: {
     query: jest.fn(),
     remove: jest.fn(),
-    create: jest.fn()
+    create: jest.fn(),
+    group: jest.fn(),
+    discard: jest.fn(),
+    onUpdated: {
+      addListener: jest.fn()
+    }
+  },
+  tabGroups: {
+    query: jest.fn(),
+    update: jest.fn()
   },
   windows: {
-    create: jest.fn()
+    create: jest.fn(),
+    getAll: jest.fn(),
+    onFocusChanged: {
+      addListener: jest.fn()
+    }
+  },
+  alarms: {
+    create: jest.fn(),
+    onAlarm: {
+      addListener: jest.fn()
+    }
   },
   storage: {
     local: {
@@ -57,6 +76,8 @@ Object.defineProperty(window, 'matchMedia', {
   }))
 });
 
+window.alert = jest.fn();
+
 // Mock Material Icons
 // Mock Material Icons - commented out for now
 // const mockMaterialIcons = {
@@ -87,14 +108,14 @@ global.testUtils = {
     pinned: false,
     windowId: 1
   }),
-  
+
   createMockSession: (id, name, tabs) => ({
     id,
     name,
     tabs,
     createdAt: new Date().toISOString()
   }),
-  
+
   createMockWindow: (id, tabs = []) => ({
     id,
     tabs,

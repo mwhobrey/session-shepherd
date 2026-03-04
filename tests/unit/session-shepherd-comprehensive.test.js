@@ -612,267 +612,267 @@ describe('SessionShepherd Comprehensive Tests', () => {
     });
   });
 
-          describe('Error Handling', () => {
-            test('should handle initialization errors gracefully', async () => {
-              // Mock chrome.tabs.query to throw an error
-              chrome.tabs.query.mockRejectedValue(new Error('Tab query failed'));
+  describe('Error Handling', () => {
+    test('should handle initialization errors gracefully', async () => {
+      // Mock chrome.tabs.query to throw an error
+      chrome.tabs.query.mockRejectedValue(new Error('Tab query failed'));
               
-              const shepherd = new SessionShepherd();
+      const shepherd = new SessionShepherd();
               
-              // Wait for async operations to complete
-              await new Promise(resolve => setTimeout(resolve, 100));
+      // Wait for async operations to complete
+      await new Promise(resolve => setTimeout(resolve, 100));
               
-              // Should not throw and should handle error gracefully
-              expect(shepherd).toBeDefined();
-            });
+      // Should not throw and should handle error gracefully
+      expect(shepherd).toBeDefined();
+    });
 
-            test('should handle storage errors gracefully', async () => {
-              chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
+    test('should handle storage errors gracefully', async () => {
+      chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
               
-              const shepherd = new SessionShepherd();
-              await shepherd.loadSessions();
+      const shepherd = new SessionShepherd();
+      await shepherd.loadSessions();
               
-              expect(shepherd.sessions).toEqual([]);
-            });
+      expect(shepherd.sessions).toEqual([]);
+    });
 
-            test('should handle tab loading errors', async () => {
-              chrome.tabs.query.mockRejectedValue(new Error('Tab query failed'));
+    test('should handle tab loading errors', async () => {
+      chrome.tabs.query.mockRejectedValue(new Error('Tab query failed'));
               
-              const shepherd = new SessionShepherd();
-              await shepherd.loadCurrentTabs();
+      const shepherd = new SessionShepherd();
+      await shepherd.loadCurrentTabs();
               
-              expect(shepherd.currentTabs).toEqual([]);
-            });
+      expect(shepherd.currentTabs).toEqual([]);
+    });
 
-            test('should handle session save errors', async () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [{ id: 1, title: 'Test', url: 'https://example.com' }];
-              shepherd.selectedTabIds.add(1);
+    test('should handle session save errors', async () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [{ id: 1, title: 'Test', url: 'https://example.com' }];
+      shepherd.selectedTabIds.add(1);
               
-              // Mock form elements
-              document.getElementById('session-name').value = 'Test Session';
-              document.getElementById('session-category').value = 'work';
-              document.getElementById('session-tags').value = 'test';
+      // Mock form elements
+      document.getElementById('session-name').value = 'Test Session';
+      document.getElementById('session-category').value = 'work';
+      document.getElementById('session-tags').value = 'test';
               
-              chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
+      chrome.storage.local.get.mockRejectedValue(new Error('Storage error'));
               
-              await shepherd.saveSession(false);
+      await shepherd.saveSession(false);
               
-              // Should handle error gracefully
-              expect(shepherd).toBeDefined();
-            });
+      // Should handle error gracefully
+      expect(shepherd).toBeDefined();
+    });
 
-            test('should handle restore session errors', async () => {
-              const shepherd = new SessionShepherd();
-              const session = {
-                id: '1',
-                name: 'Test Session',
-                tabs: [{ title: 'Test', url: 'https://example.com' }]
-              };
+    test('should handle restore session errors', async () => {
+      const shepherd = new SessionShepherd();
+      const session = {
+        id: '1',
+        name: 'Test Session',
+        tabs: [{ title: 'Test', url: 'https://example.com' }]
+      };
               
-              chrome.windows.create.mockRejectedValue(new Error('Window creation failed'));
+      chrome.windows.create.mockRejectedValue(new Error('Window creation failed'));
               
-              await shepherd.restoreSession(session);
+      await shepherd.restoreSession(session);
               
-              // Should handle error gracefully
-              expect(shepherd).toBeDefined();
-            });
-          });
+      // Should handle error gracefully
+      expect(shepherd).toBeDefined();
+    });
+  });
 
-          describe('Theme Management', () => {
-            test('should initialize theme correctly', () => {
-              const shepherd = new SessionShepherd();
+  describe('Theme Management', () => {
+    test('should initialize theme correctly', () => {
+      const shepherd = new SessionShepherd();
               
-              // Should have theme-related properties
-              expect(shepherd).toBeDefined();
-            });
+      // Should have theme-related properties
+      expect(shepherd).toBeDefined();
+    });
 
-            test('should apply light theme', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.applyTheme('light');
+    test('should apply light theme', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.applyTheme('light');
               
-              expect(document.body.className).toContain('light');
-            });
+      expect(document.body.className).toContain('light');
+    });
 
-            test('should apply dark theme', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.applyTheme('dark');
+    test('should apply dark theme', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.applyTheme('dark');
               
-              expect(document.body.className).toContain('dark');
-            });
-          });
+      expect(document.body.className).toContain('dark');
+    });
+  });
 
-          describe('Tab Management', () => {
-            test('should load current tabs', async () => {
-              const mockTabs = [
-                { id: 1, title: 'Regular Tab', url: 'https://example.com', favIconUrl: 'icon1.png' },
-                { id: 2, title: 'Chrome Settings', url: 'chrome://settings', favIconUrl: 'icon2.png' },
-                { id: 3, title: 'Another Tab', url: 'https://test.com', favIconUrl: 'icon3.png' }
-              ];
+  describe('Tab Management', () => {
+    test('should load current tabs', async () => {
+      const mockTabs = [
+        { id: 1, title: 'Regular Tab', url: 'https://example.com', favIconUrl: 'icon1.png' },
+        { id: 2, title: 'Chrome Settings', url: 'chrome://settings', favIconUrl: 'icon2.png' },
+        { id: 3, title: 'Another Tab', url: 'https://test.com', favIconUrl: 'icon3.png' }
+      ];
               
-              chrome.tabs.query.mockResolvedValue(mockTabs);
+      chrome.tabs.query.mockResolvedValue(mockTabs);
               
-              const shepherd = new SessionShepherd();
-              await shepherd.loadCurrentTabs();
+      const shepherd = new SessionShepherd();
+      await shepherd.loadCurrentTabs();
               
-              expect(shepherd.currentTabs).toHaveLength(3);
-              expect(shepherd.currentTabs[0].url).toBe('https://example.com');
-            });
+      expect(shepherd.currentTabs).toHaveLength(3);
+      expect(shepherd.currentTabs[0].url).toBe('https://example.com');
+    });
 
-            test('should toggle tab selection', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [
-                { id: 1, title: 'Tab 1', url: 'https://example.com' },
-                { id: 2, title: 'Tab 2', url: 'https://test.com' }
-              ];
+    test('should toggle tab selection', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [
+        { id: 1, title: 'Tab 1', url: 'https://example.com' },
+        { id: 2, title: 'Tab 2', url: 'https://test.com' }
+      ];
               
-              shepherd.toggleTabSelection(1, true);
-              expect(shepherd.selectedTabIds.has(1)).toBe(true);
+      shepherd.toggleTabSelection(1, true);
+      expect(shepherd.selectedTabIds.has(1)).toBe(true);
               
-              shepherd.toggleTabSelection(1, false);
-              expect(shepherd.selectedTabIds.has(1)).toBe(false);
-            });
+      shepherd.toggleTabSelection(1, false);
+      expect(shepherd.selectedTabIds.has(1)).toBe(false);
+    });
 
-            test('should select all tabs', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [
-                { id: 1, title: 'Tab 1', url: 'https://example.com' },
-                { id: 2, title: 'Tab 2', url: 'https://test.com' }
-              ];
+    test('should select all tabs', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [
+        { id: 1, title: 'Tab 1', url: 'https://example.com' },
+        { id: 2, title: 'Tab 2', url: 'https://test.com' }
+      ];
               
-              shepherd.selectAllTabs();
+      shepherd.selectAllTabs();
               
-              expect(shepherd.selectedTabIds.has(1)).toBe(true);
-              expect(shepherd.selectedTabIds.has(2)).toBe(true);
-            });
+      expect(shepherd.selectedTabIds.has(1)).toBe(true);
+      expect(shepherd.selectedTabIds.has(2)).toBe(true);
+    });
 
-            test('should select no tabs', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [
-                { id: 1, title: 'Tab 1', url: 'https://example.com' },
-                { id: 2, title: 'Tab 2', url: 'https://test.com' }
-              ];
+    test('should select no tabs', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [
+        { id: 1, title: 'Tab 1', url: 'https://example.com' },
+        { id: 2, title: 'Tab 2', url: 'https://test.com' }
+      ];
               
-              shepherd.selectedTabIds.add(1);
-              shepherd.selectedTabIds.add(2);
+      shepherd.selectedTabIds.add(1);
+      shepherd.selectedTabIds.add(2);
               
-              shepherd.selectNoTabs();
+      shepherd.selectNoTabs();
               
-              expect(shepherd.selectedTabIds.size).toBe(0);
-            });
-          });
+      expect(shepherd.selectedTabIds.size).toBe(0);
+    });
+  });
 
-          describe('Tab Filtering', () => {
-            test('should filter tabs by title', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [
-                { id: 1, title: 'GitHub Repository', url: 'https://github.com/user/repo' },
-                { id: 2, title: 'Google Search', url: 'https://google.com/search' },
-                { id: 3, title: 'Stack Overflow', url: 'https://stackoverflow.com/questions' }
-              ];
+  describe('Tab Filtering', () => {
+    test('should filter tabs by title', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [
+        { id: 1, title: 'GitHub Repository', url: 'https://github.com/user/repo' },
+        { id: 2, title: 'Google Search', url: 'https://google.com/search' },
+        { id: 3, title: 'Stack Overflow', url: 'https://stackoverflow.com/questions' }
+      ];
               
-              // Should not throw errors when filtering
-              expect(() => shepherd.filterTabs('GitHub')).not.toThrow();
-            });
+      // Should not throw errors when filtering
+      expect(() => shepherd.filterTabs('GitHub')).not.toThrow();
+    });
 
-            test('should filter tabs by URL', () => {
-              const shepherd = new SessionShepherd();
-              shepherd.currentTabs = [
-                { id: 1, title: 'GitHub Repository', url: 'https://github.com/user/repo' },
-                { id: 2, title: 'Google Search', url: 'https://google.com/search' },
-                { id: 3, title: 'Stack Overflow', url: 'https://stackoverflow.com/questions' }
-              ];
+    test('should filter tabs by URL', () => {
+      const shepherd = new SessionShepherd();
+      shepherd.currentTabs = [
+        { id: 1, title: 'GitHub Repository', url: 'https://github.com/user/repo' },
+        { id: 2, title: 'Google Search', url: 'https://google.com/search' },
+        { id: 3, title: 'Stack Overflow', url: 'https://stackoverflow.com/questions' }
+      ];
               
-              // Should not throw errors when filtering
-              expect(() => shepherd.filterTabs('stackoverflow')).not.toThrow();
-            });
-          });
+      // Should not throw errors when filtering
+      expect(() => shepherd.filterTabs('stackoverflow')).not.toThrow();
+    });
+  });
 
-          describe('Form Validation', () => {
-            test('should validate session name correctly', () => {
-              const shepherd = new SessionShepherd();
-              const nameInput = document.getElementById('session-name');
+  describe('Form Validation', () => {
+    test('should validate session name correctly', () => {
+      const shepherd = new SessionShepherd();
+      const nameInput = document.getElementById('session-name');
               
-              // Test empty name
-              nameInput.value = '';
-              expect(shepherd.validateSessionName()).toBe(false);
+      // Test empty name
+      nameInput.value = '';
+      expect(shepherd.validateSessionName()).toBe(false);
               
-              // Test valid name
-              nameInput.value = 'Valid Session Name';
-              expect(shepherd.validateSessionName()).toBe(true);
-            });
+      // Test valid name
+      nameInput.value = 'Valid Session Name';
+      expect(shepherd.validateSessionName()).toBe(true);
+    });
 
-            test('should update action buttons', () => {
-              const shepherd = new SessionShepherd();
+    test('should update action buttons', () => {
+      const shepherd = new SessionShepherd();
               
-              // Mock selected tabs
-              shepherd.selectedTabIds.add(1);
+      // Mock selected tabs
+      shepherd.selectedTabIds.add(1);
               
-              // Should not throw errors
-              expect(() => shepherd.updateActionButtons()).not.toThrow();
-            });
-          });
+      // Should not throw errors
+      expect(() => shepherd.updateActionButtons()).not.toThrow();
+    });
+  });
 
-          describe('Utility Methods', () => {
-            test('should get domain from URL correctly', () => {
-              const shepherd = new SessionShepherd();
+  describe('Utility Methods', () => {
+    test('should get domain from URL correctly', () => {
+      const shepherd = new SessionShepherd();
               
-              expect(shepherd.getDomainFromUrl('https://example.com/path')).toBe('example.com');
-              expect(shepherd.getDomainFromUrl('http://subdomain.test.com')).toBe('subdomain.test.com');
-            });
+      expect(shepherd.getDomainFromUrl('https://example.com/path')).toBe('example.com');
+      expect(shepherd.getDomainFromUrl('http://subdomain.test.com')).toBe('subdomain.test.com');
+    });
 
-            test('should handle invalid URLs', () => {
-              const shepherd = new SessionShepherd();
+    test('should handle invalid URLs', () => {
+      const shepherd = new SessionShepherd();
               
-              expect(shepherd.getDomainFromUrl('invalid-url')).toBe('invalid-url');
-            });
+      expect(shepherd.getDomainFromUrl('invalid-url')).toBe('invalid-url');
+    });
 
-            test('should escape HTML correctly', () => {
-              const shepherd = new SessionShepherd();
+    test('should escape HTML correctly', () => {
+      const shepherd = new SessionShepherd();
               
-              expect(shepherd.escapeHtml('<script>alert("xss")</script>')).toBe('&lt;script&gt;alert("xss")&lt;/script&gt;');
-              expect(shepherd.escapeHtml('Simple text')).toBe('Simple text');
-            });
-          });
+      expect(shepherd.escapeHtml('<script>alert("xss")</script>')).toBe('&lt;script&gt;alert("xss")&lt;/script&gt;');
+      expect(shepherd.escapeHtml('Simple text')).toBe('Simple text');
+    });
+  });
 
-          describe('Auto-save Functionality', () => {
-            test('should initialize auto-save', () => {
-              const shepherd = new SessionShepherd();
+  describe('Auto-save Functionality', () => {
+    test('should initialize auto-save', () => {
+      const shepherd = new SessionShepherd();
               
-              // Should have auto-save related properties
-              expect(shepherd).toBeDefined();
-            });
-          });
+      // Should have auto-save related properties
+      expect(shepherd).toBeDefined();
+    });
+  });
 
-          describe('Keyboard Shortcuts', () => {
-            test('should initialize keyboard shortcuts', () => {
-              const shepherd = new SessionShepherd();
+  describe('Keyboard Shortcuts', () => {
+    test('should initialize keyboard shortcuts', () => {
+      const shepherd = new SessionShepherd();
               
-              // Should have keyboard shortcut handling
-              expect(shepherd).toBeDefined();
-            });
+      // Should have keyboard shortcut handling
+      expect(shepherd).toBeDefined();
+    });
 
-            test('should handle keyboard events', () => {
-              const shepherd = new SessionShepherd();
+    test('should handle keyboard events', () => {
+      const shepherd = new SessionShepherd();
               
-              const event = {
-                key: 's',
-                ctrlKey: true,
-                preventDefault: jest.fn(),
-                target: { tagName: 'BODY' }
-              };
+      const event = {
+        key: 's',
+        ctrlKey: true,
+        preventDefault: jest.fn(),
+        target: { tagName: 'BODY' }
+      };
               
-              // Should not throw errors
-              expect(() => shepherd.handleKeyboardShortcuts(event)).not.toThrow();
-            });
-          });
+      // Should not throw errors
+      expect(() => shepherd.handleKeyboardShortcuts(event)).not.toThrow();
+    });
+  });
 
-          describe('Storage Synchronization', () => {
-            test('should initialize storage sync', () => {
-              const shepherd = new SessionShepherd();
+  describe('Storage Synchronization', () => {
+    test('should initialize storage sync', () => {
+      const shepherd = new SessionShepherd();
               
-              // Should not throw errors when initializing storage sync
-              expect(() => shepherd.initStorageSync()).not.toThrow();
-            });
-          });
+      // Should not throw errors when initializing storage sync
+      expect(() => shepherd.initStorageSync()).not.toThrow();
+    });
+  });
 });
