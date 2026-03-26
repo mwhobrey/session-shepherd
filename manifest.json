@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Session Shepherd",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Beautiful, intuitive session management for your browser tabs. Save, organize, and restore tab groups with ease.",
   "permissions": [
     "tabs",
